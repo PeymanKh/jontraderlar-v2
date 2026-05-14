@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from langgraph.checkpoint.mongodb import AsyncMongoDBSaver
+from langgraph.checkpoint.mongodb import MongoDBSaver
 from langgraph.graph import END, START, StateGraph
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import MongoClient
 
 from app.config import settings
 from app.logging import get_logger
@@ -56,7 +56,7 @@ def _after_database_check(state: WorkflowState) -> str:
 # ---- compilation -----------------------------------------------------------
 
 _workflow: Any | None = None
-_checkpoint_client: AsyncIOMotorClient | None = None
+_checkpoint_client: MongoClient | None = None
 
 
 def build_graph() -> Any:
@@ -79,9 +79,14 @@ def build_graph() -> Any:
     workflow.add_edge("telegram_url", END)
     workflow.add_edge("follow_up", END)
 
-    _checkpoint_client = AsyncIOMotorClient(settings.database.uri.get_secret_value())
-    checkpoint_db = _checkpoint_client[settings.database.checkpoint_name]
-    checkpointer = AsyncMongoDBSaver(checkpoint_db, versions_to_keep=1)
+    # langgraph-checkpoint-mongodb 0.4.x: MongoDBSaver takes a sync pymongo
+    # client + a db name, and exposes the async methods (aget_tuple/aput/...)
+    # that workflow.ainvoke() relies on.
+    _checkpoint_client = MongoClient(settings.database.uri.get_secret_value())
+    checkpointer = MongoDBSaver(
+        client=_checkpoint_client,
+        db_name=settings.database.checkpoint_name,
+    )
 
     return workflow.compile(checkpointer=checkpointer)
 
