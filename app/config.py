@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Annotated
 
 from pydantic import BaseModel, Field, SecretStr, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Environment(str, Enum):
@@ -98,7 +98,9 @@ class Settings(BaseSettings):
     bingx: ExchangeCredentials
     bybit: ExchangeCredentials
 
-    blocked_uids: Annotated[list[int], Field(default_factory=list)]
+    # NoDecode: skip pydantic-settings' JSON parsing — the validator below
+    # handles the comma-separated env format instead.
+    blocked_uids: Annotated[list[int], NoDecode, Field(default_factory=list)]
 
     @field_validator("blocked_uids", mode="before")
     @classmethod
