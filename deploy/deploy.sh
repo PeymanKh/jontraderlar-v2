@@ -1,25 +1,21 @@
 #!/usr/bin/env bash
-# Subsequent-deploy helper. Run as the `jontraderlar` user.
+# Subsequent-deploy helper. Run as a sudo-capable user (e.g. peyman):
 #
-#   sudo -u jontraderlar /opt/jontraderlar/deploy/deploy.sh
+#   /opt/jontraderlar/jontraderlar-v2/deploy/deploy.sh
 #
-# It pulls the latest code, refreshes dependencies, and restarts both
-# systemd units. The restart itself is fast — Telegram retries on
-# transient failures, so a few seconds of downtime is fine.
+# Pulls the latest code as the jontraderlar user, refreshes dependencies,
+# and restarts both systemd units.
 
 set -euo pipefail
 
-APP_DIR="/opt/jontraderlar"
-VENV="${APP_DIR}/.venv"
-
-cd "${APP_DIR}"
+REPO_DIR="/opt/jontraderlar/jontraderlar-v2"
+VENV="${REPO_DIR}/.venv"
 
 echo "→ Pulling latest code..."
-git pull --ff-only
+sudo -u jontraderlar git -C "${REPO_DIR}" pull --ff-only
 
 echo "→ Updating Python dependencies..."
-"${VENV}/bin/pip" install --upgrade pip
-"${VENV}/bin/pip" install -e .
+sudo -u jontraderlar "${VENV}/bin/pip" install -e "${REPO_DIR}"
 
 echo "→ Restarting services..."
 sudo systemctl restart jontraderlar-bot jontraderlar-worker

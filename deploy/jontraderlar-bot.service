@@ -1,38 +1,24 @@
 [Unit]
 Description=Jön Traderlar Bot — FastAPI gateway
-After=network.target redis-server.service mongod.service
-Wants=redis-server.service mongod.service
+After=network-online.target redis-server.service
+Wants=network-online.target redis-server.service
 
 [Service]
 Type=simple
 User=jontraderlar
 Group=jontraderlar
-WorkingDirectory=/opt/jontraderlar
+WorkingDirectory=/opt/jontraderlar/jontraderlar-v2
 EnvironmentFile=/etc/jontraderlar/.env
-ExecStart=/opt/jontraderlar/.venv/bin/uvicorn app.main:app \
-    --host 127.0.0.1 \
-    --port 8080 \
-    --workers 1 \
-    --proxy-headers \
-    --forwarded-allow-ips=127.0.0.1
+ExecStart=/opt/jontraderlar/jontraderlar-v2/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8080 --workers 1 --proxy-headers --forwarded-allow-ips=127.0.0.1
 Restart=always
 RestartSec=5
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=jontraderlar-bot
 
-# Hardening
+# Basic hardening — safe defaults, no footguns
 NoNewPrivileges=true
 PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=true
-ReadWritePaths=/opt/jontraderlar
-ProtectControlGroups=true
-ProtectKernelModules=true
-ProtectKernelTunables=true
-RestrictNamespaces=true
-RestrictSUIDSGID=true
-LockPersonality=true
 
 [Install]
 WantedBy=multi-user.target
