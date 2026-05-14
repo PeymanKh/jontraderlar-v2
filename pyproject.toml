@@ -1,0 +1,46 @@
+[project]
+name = "jontraderlar"
+version = "2.0.0"
+description = "Jön Traderlar Telegram verification bot"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "aiogram>=3.13",
+    "arq>=0.26",
+    "redis>=5.0",
+    "motor>=3.7",
+    "pymongo>=4.12",
+    "pydantic>=2.11",
+    "pydantic-settings>=2.10",
+    "aiohttp>=3.12",
+    "aiolimiter>=1.2",
+    "tenacity>=9.1",
+    "langgraph>=0.6",
+    "langgraph-checkpoint-mongodb>=0.1",
+    "langchain>=0.3",
+    "langchain-core>=0.3",
+    "langchain-openai>=0.3",
+    "langchain-google-genai>=2.1",
+    "python-json-logger>=3.3",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["ruff", "pytest", "pytest-asyncio", "ipython"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]

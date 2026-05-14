@@ -1,0 +1,33 @@
+[Unit]
+Description=Jön Traderlar Worker — ARQ task runner
+After=network.target redis-server.service mongod.service jontraderlar-bot.service
+Wants=redis-server.service mongod.service
+
+[Service]
+Type=simple
+User=jontraderlar
+Group=jontraderlar
+WorkingDirectory=/opt/jontraderlar
+EnvironmentFile=/etc/jontraderlar/.env
+ExecStart=/opt/jontraderlar/.venv/bin/arq app.worker.WorkerSettings
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jontraderlar-worker
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/jontraderlar
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+RestrictNamespaces=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

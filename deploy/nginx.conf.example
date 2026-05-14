@@ -1,0 +1,29 @@
+# /etc/nginx/sites-available/jontraderlar
+#
+# After copying to sites-available and symlinking to sites-enabled,
+# run `certbot --nginx -d bot.example.com` to add TLS.
+# Replace bot.example.com with your real domain.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name bot.example.com;
+
+    # Telegram webhook + health checks proxy through to the FastAPI app.
+    location / {
+        proxy_pass         http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+
+        # Telegram retries on timeout, but webhooks should be very fast.
+        proxy_connect_timeout 5s;
+        proxy_send_timeout    10s;
+        proxy_read_timeout    10s;
+    }
+
+    # Optional: small body limit — Telegram updates are tiny.
+    client_max_body_size 1m;
+}
