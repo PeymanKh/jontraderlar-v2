@@ -15,7 +15,7 @@ class User(BaseModel):
     """One record per Telegram user."""
 
     telegram_id: int = Field(..., gt=0)
-    telegram_username: str = Field(..., min_length=1, max_length=64)
+    telegram_username: str = Field(default="", max_length=64)
     telegram_full_name: str = Field(..., min_length=1, max_length=128)
     warnings: int = Field(default=0, ge=0)
     join_date: datetime = Field(default_factory=_utcnow)
