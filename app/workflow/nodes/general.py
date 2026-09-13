@@ -15,7 +15,16 @@ async def general_node(state: WorkflowState) -> WorkflowState:
     try:
         model = create_chat_model()
         response = await model.ainvoke(general_messages(state))
-        content = (response.content or "").strip()
+
+        # Newer Gemini models return content as a list of blocks;
+        # older ones return a plain string. Handle both.
+        raw = response.content
+        if isinstance(raw, list):
+            raw = "".join(
+                part.get("text", "") if isinstance(part, dict) else str(part)
+                for part in raw
+            )
+        content = (raw or "").strip()
 
         if not content:
             logger.warning("general_node: empty LLM response, using fallback")
