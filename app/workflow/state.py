@@ -4,7 +4,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 
 
 class Route(str, Enum):
@@ -26,8 +26,12 @@ class UserMetadata(BaseModel):
 
 class RouterOutput(BaseModel):
     route: Route
-    exchange: str | None = None
-    uid: int | None = Field(default=None, gt=0)
+    exchange: str | None = Field(
+        default=None, validation_alias=AliasChoices("exchange", "exchange_name")
+    )
+    uid: int | None = Field(
+        default=None, gt=0, validation_alias=AliasChoices("uid", "exchange_uid")
+    )
     missing_data: bool = False
     unsupported_exchange: bool = False
     invalid_uid_format: bool = False

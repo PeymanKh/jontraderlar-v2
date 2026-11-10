@@ -19,6 +19,7 @@ async def router_node(state: WorkflowState) -> WorkflowState:
         structured = model.with_structured_output(RouterOutput, method="json_mode")
         result: RouterOutput = await structured.ainvoke(router_messages(state))
 
+        logger.info("router_node result: %s", result.model_dump())
         updated = state.model_copy(update={"router": result})
 
         if result.route == Route.verification:

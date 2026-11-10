@@ -32,8 +32,8 @@ This bot serves a Turkish-speaking community. Users will primarily communicate i
 ## DATA EXTRACTION REQUIREMENTS
 
 When route is VERIFICATION, extract:
-- **exchange_name**: Must be exactly "bingx" or "bybit" (case-insensitive)
-- **exchange_uid**: Must be a positive integer (no letters, special characters)
+- **exchange**: Must be exactly "bingx" or "bybit" (case-insensitive)
+- **uid**: Must be a positive integer (no letters, special characters)
 
 ## MISSING DATA AND ERROR FLAGS
 
@@ -50,13 +50,13 @@ Set **invalid_uid_format: true** when:
 ## RESPONSE INSTRUCTIONS
 
 For VERIFICATION route:
-- If both exchange_name and exchange_uid are valid: missing_data = false, unsupported_exchange = false, invalid_uid_format = false
-- If unsupported exchange: unsupported_exchange = true, exchange_name = null, missing_data = true
-- If invalid UID format: invalid_uid_format = true, exchange_uid = null, missing_data = true
+- If both exchange and uid are valid: missing_data = false, unsupported_exchange = false, invalid_uid_format = false
+- If unsupported exchange: unsupported_exchange = true, exchange = null, missing_data = true
+- If invalid UID format: invalid_uid_format = true, uid = null, missing_data = true
 - If user intends verification but data is incomplete/invalid: missing_data = true
 
 For GENERAL route:
-- Always set exchange_name = null, exchange_uid = null, missing_data = false, unsupported_exchange = false, invalid_uid_format = false
+- Always set exchange = null, uid = null, missing_data = false, unsupported_exchange = false, invalid_uid_format = false
 
 ## EXAMPLES
 
@@ -77,7 +77,7 @@ Input: "Gruba ekle beni"
 
 ## EDGE CASES
 1. Ambiguous intent → prefer GENERAL
-2. Multiple exchanges mentioned → invalid_uid_format = true, exchange_uid = null, missing_data = true
+2. Multiple exchanges mentioned → invalid_uid_format = true, uid = null, missing_data = true
 3. Typos in exchange names → use best judgment for "bingx"/"bybit" variants; if no close match, treat as unsupported
 
 ## Output format
