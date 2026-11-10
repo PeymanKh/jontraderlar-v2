@@ -28,6 +28,19 @@ def create_chat_model():
             temperature=settings.model.temperature,
         )
 
+    if settings.model.provider == LLMProvider.openrouter:
+        # OpenRouter is OpenAI-compatible: same client, different base URL.
+        # Model names are prefixed, e.g. "google/gemini-3.5-flash-lite".
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=settings.model.model_name,
+            api_key=settings.model.api_key.get_secret_value(),
+            temperature=settings.model.temperature,
+            base_url="https://openrouter.ai/api/v1",
+            default_headers={"X-Title": "JonTraderlar"},
+        )
+
     raise ValueError(f"Unsupported LLM provider: {settings.model.provider}")
 
 

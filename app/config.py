@@ -30,6 +30,7 @@ class LogLevel(str, Enum):
 class LLMProvider(str, Enum):
     openai = "openai"
     google = "google"
+    openrouter = "openrouter"
 
 
 class TelegramConfig(BaseModel):
