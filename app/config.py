@@ -66,6 +66,9 @@ class ModelConfig(BaseModel):
 class ExchangeCredentials(BaseModel):
     api_key: SecretStr
     secret_key: SecretStr
+    # Optional HTTP proxy for this exchange only, e.g.
+    # http://user:pass@isp.decodo.com:10001 (ByBit blocks US IPs).
+    http_proxy: SecretStr | None = None
 
 
 class Settings(BaseSettings):

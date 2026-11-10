@@ -44,6 +44,7 @@ class BaseClientConfig(BaseModel):
     secret_key: SecretStr
     timeout: int = 10
     max_retries: int = 3
+    http_proxy: SecretStr | None = None
 
 
 class BaseExchangeClient:
@@ -68,6 +69,12 @@ class BaseExchangeClient:
         if self.session is not None:
             await self.session.close()
 
+    @property
+    def proxy(self) -> str | None:
+        """Proxy URL for outgoing requests, or None to connect directly."""
+        p = self.config.http_proxy
+        return p.get_secret_value() if p else None
+
     @staticmethod
     def _log_retry(state: RetryCallState) -> None:
         logger.warning(
@@ -90,7 +97,9 @@ class BaseExchangeClient:
         url = f"{self.config.base_url}{endpoint}"
         async with self.limiter:
             try:
-                async with self.session.request(method, url, params=params, json=data) as response:
+                async with self.session.request(
+                    method, url, params=params, json=data, proxy=self.proxy
+                ) as response:
                     response.raise_for_status()
                     return await response.json()
             except aiohttp.ContentTypeError as e:

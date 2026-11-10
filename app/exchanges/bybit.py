@@ -23,6 +23,7 @@ class ByBitClient(BaseExchangeClient):
                 base_url=self.BASE_URL,
                 api_key=settings.bybit.api_key,
                 secret_key=settings.bybit.secret_key,
+                http_proxy=settings.bybit.http_proxy,
                 timeout=10,
                 max_retries=3,
             )
@@ -59,6 +60,7 @@ class ByBitClient(BaseExchangeClient):
                 f"{self.config.base_url}/v5/user/aff-customer-info",
                 params=params,
                 headers=headers,
+                proxy=self.proxy,
             ) as response:
                 response.raise_for_status()
                 body = await response.json()
